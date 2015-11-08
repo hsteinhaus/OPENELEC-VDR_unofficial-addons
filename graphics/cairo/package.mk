@@ -25,7 +25,7 @@ PKG_ARCH="any"
 PKG_LICENSE="LGPL"
 PKG_SITE="http://cairographics.org/"
 PKG_URL="http://cairographics.org/releases/$PKG_NAME-$PKG_VERSION.tar.xz"
-PKG_DEPENDS_TARGET="toolchain zlib freetype fontconfig libpng pixman libXrender libX11 mesa glu"
+PKG_DEPENDS_TARGET="toolchain zlib freetype fontconfig libpng pixman"
 PKG_PRIORITY="optional"
 PKG_SECTION="graphics"
 PKG_SHORTDESC="cairo: Multi-platform 2D graphics library"
@@ -46,8 +46,8 @@ PKG_CONFIGURE_OPTS_TARGET="--x-includes="$SYSROOT_PREFIX/usr/include" \
             --enable-atomic \
             --disable-gcov \
             --disable-valgrind \
-            --enable-xlib \
-            --enable-xlib-xrender \
+            --disable-xlib \
+            --disable-xlib-xrender \
             --disable-xcb \
             --disable-xlib-xcb \
             --disable-xcb-shm \
@@ -67,11 +67,11 @@ PKG_CONFIGURE_OPTS_TARGET="--x-includes="$SYSROOT_PREFIX/usr/include" \
             --disable-gallium \
             --disable-xcb-drm \
             --enable-png \
-            --enable-gl \
+            --disable-gl \
             --disable-directfb \
             --disable-vg \
             --disable-egl \
-            --enable-glx \
+            --disable-glx \
             --disable-wgl \
             --disable-script \
             --enable-ft \
@@ -90,4 +90,4 @@ PKG_CONFIGURE_OPTS_TARGET="--x-includes="$SYSROOT_PREFIX/usr/include" \
             --disable-symbol-lookup \
             --enable-some-floating-point \
             --with-gnu-ld \
-            --with-x"
+            --without-x"
