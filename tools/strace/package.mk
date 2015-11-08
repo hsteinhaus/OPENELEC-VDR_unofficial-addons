@@ -43,5 +43,5 @@ makeinstall_target() {
   make all
   mkdir -p $INSTALL/usr/bin
   echo "====== $PKG_BUILD/.$TARGET_NAME/strace $INSTALL/usr/bin/"
-  cp -P $PKG_BUILD/.$TARGET_NAME/strace $INSTALL/usr/bin/
+  cp -P $ROOT/$PKG_BUILD/.$TARGET_NAME/strace $INSTALL/usr/bin/
 }
