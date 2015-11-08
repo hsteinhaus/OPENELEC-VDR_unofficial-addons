@@ -1,0 +1,17 @@
+[Unit]
+Description=VDR frontend service
+After=graphical.target
+Requires=graphical.target
+#After=eventlircd.service
+#Requires=eventlircd.service
+
+[Service]
+ExecStart=/bin/sh -c "exec sh /usr/bin/vdr.start"
+ExecStop=/bin/killall vdr
+TimeoutStopSec=15
+Restart=always
+RestartSec=2
+StartLimitInterval=0
+
+[Install]
+WantedBy=vdr.target

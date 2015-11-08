@@ -1,0 +1,16 @@
+[Unit]
+Description=DHCP client
+Requires=vdr-network.service
+After=vdr-network.service
+
+[Service]
+Type=forking
+EnvironmentFile=/storage/.config/vdr/network.conf
+ExecStart=/sbin/udhcpc -i ${DHCP_DEVICE}
+ExecStop=/bin/killall udhcpc
+RemainAfterExit=yes
+Restart=on-failure
+
+[Install]
+RequiredBy=vdr-mount.service
+WantedBy=vdr.target

@@ -1,0 +1,10 @@
+#!/bin/sh
+
+. /storage/.config/vdr/network.conf
+
+/sbin/ip link set ${NIC_DEVICE} up
+/sbin/ip link add link ${NIC_DEVICE} name ${NIC_DEVICE}.${VLAN} type vlan id ${VLAN} 
+/sbin/ip link set ${NIC_DEVICE}.${VLAN} up
+/sbin/ip addr add ${NIC_IP} dev ${NIC_DEVICE}
+
+exit 0

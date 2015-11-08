@@ -1,0 +1,11 @@
+[Unit]
+Description=mount VDR's video directory
+After=vdr-dhcp.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/vdr.mount
+
+[Install]
+WantedBy=vdr.target
+#WantedBy=kodi.target

@@ -1,0 +1,16 @@
+#!/bin/sh
+
+. /storage/.config/vdr/network.conf
+
+mkdir -p /storage/vdr
+
+while [ ! -f /storage/vdr/.update ]; do
+   if  mount.nfs4 -o noatime,nodiratime,nolock,async ${NFS_SERVER}:${NFS_MOUNT} /storage/vdr; then
+      sleep 1
+      echo "UPDR" | nc localhost 6419 
+      echo "mounted"
+      exit 0
+   else 
+      sleep 5
+   fi
+done

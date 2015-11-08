@@ -1,0 +1,13 @@
+[Unit]
+Description=Basic network interface initialisation
+Requires=sysinit.target
+After=sysinit.target
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh /usr/bin/vdr.network
+
+[Install]
+RequiredBy=vdr-dhcp.service
+WantedBy=vdr.target
+

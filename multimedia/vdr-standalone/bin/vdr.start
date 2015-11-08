@@ -1,0 +1,189 @@
+#!/bin/sh
+
+################################################################################
+#      This file is part of OpenELEC - http://www.openelec.tv
+#      Copyright (C) 2009-2014 Stephan Raue (stephan@openelec.tv)
+#
+#  OpenELEC is free software: you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation, either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  OpenELEC is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with OpenELEC.  If not, see <http://www.gnu.org/licenses/>.
+################################################################################
+
+. /etc/profile
+
+
+DEBUG="yes"
+
+ENABLE_SOFTCAM="false"
+ENABLE_MCLI="true"
+ENABLE_RPIHD="true"
+ENABLE_ENIGMANG="true"
+ENABLE_LIVE="true"
+ENABLE_EPGSEARCH="true"
+ENABLE_NOPACITY="true"
+ENABLE_REMOTE="false"
+ENABLE_CEC="true"
+ENABLE_MARKAD="true"
+
+LIVE_PORT="8008"
+LIVE_IP="0.0.0.0"
+SVDRP_PORT="6419"
+
+CONFIG_DIR="/storage/.config/vdr"
+PLUGIN_DIR="/usr/lib/vdr"
+CACHE_DIR="$CONFIG_DIR/cache"
+
+VDR_VIDEO_DIR=/storage/vdr
+
+create_dirs() 
+{
+  # video dir
+  if [ ! -d $VDR_VIDEO_DIR ]; then
+    mkdir $VDR_VIDEO_DIR
+  fi
+}
+
+mount_nfs ()
+{
+   if [ ! -f /storage/vdr/.update ]; then
+#      sleep 2
+      mount.nfs4 -o noatime,nodiratime,nolock,async nas:/video/2 $VDR_VIDEO_DIR
+      sleep 1
+      echo "UPDR" | nc localhost 6419 
+      echo "mounted"
+   fi
+}
+
+setup_remote ()
+{
+   /usr/bin/ir-keytable -D 350
+   /usr/bin/ir-keytable -P 125
+   /usr/bin/ir-keytable -p RC5,RC6
+   /usr/bin/ir-keytable -a /etc/vdr/rc_maps.cfg
+}
+
+
+if [ "$ENABLE_EXTERNAL_RECCMD" == "true" ] ; then
+  if [ ! -z "$EXTERNAL_RECCMD_PATH" -a -x "$EXTERNAL_RECCMD_PATH" ] ; then
+    VDR_ARG="$VDR_ARG -r \"$EXTERNAL_RECCMD_PATH\""
+  fi
+fi
+
+if [ "$ENABLE_CHARSET_OVERRIDE" == "true" ] ; then
+  if [ ! -z "$CHARSET_OVERRIDE_STR" ] ; then
+    VDR_CHARSET_OVERRIDE="$CHARSET_OVERRIDE_STR"
+  fi
+fi
+
+# build plugin args
+VDR_ARG="-g /tmp --lirc=/run/lirc/lircd"
+#VDR_ARG="-g /tmp --lirc=/run/lirc/lircd-lirc0"
+if [ "$DEBUG" = "yes" ]; then
+  VDR_ARG="$VDR_ARG --log=3"
+else
+  VDR_ARG="$VDR_ARG --log=1"
+fi
+
+VDR_ARG="$VDR_ARG --port=$SVDRP_PORT"
+VDR_ARG="$VDR_ARG --config=$CONFIG_DIR"
+#VDR_ARG="$VDR_ARG --resdir=$ADDON_DIR/res"
+VDR_ARG="$VDR_ARG --cachedir=$CACHE_DIR"
+VDR_ARG="$VDR_ARG --lib=$PLUGIN_DIR"
+VDR_ARG="$VDR_ARG --video=\"$VDR_VIDEO_DIR\""
+
+# keep softcam first
+if [ "$ENABLE_SOFTCAM" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P dvbapi"
+fi
+if [ "$ENABLE_MCLI" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P\"mcli --ifname eth0 --dvb-s2 2\""
+fi
+if [ "$ENABLE_CEC" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -Pcecremote"
+fi
+if [ "$ENABLE_REMOTE" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P\"remote -i /dev/input/event5\""
+fi
+if [ "$ENABLE_RPIHD" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -Prpihddevice"
+fi
+if [ "$ENABLE_ENIGMANG" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P\"skinenigmang -l /usr/lib/vdr/skinenigmang/\""
+fi
+if [ "$ENABLE_NOPACITY" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P\"skinnopacity -l /usr/lib/vdr/skinnopacity/logos/ -i /usr/lib/vdr/skinnopacity/icons/ \""
+fi
+#VDR_ARG="$VDR_ARG -P wirbelscan -P wirbelscancontrol"
+if [ "$ENABLE_IPTV" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P 'iptv -d $IPTV_NUM_DEVICES'"
+fi
+if [ "$ENABLE_STREAMDEV_SERVER" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P streamdev-server"
+fi
+if [ "$ENABLE_STREAMDEV_CLIENT" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P streamdev-client"
+fi
+if [ "$ENABLE_LIVE" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P 'live -i $LIVE_IP -p $LIVE_PORT'"
+fi
+if [ "$ENABLE_EEPG" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P eepg"
+fi
+if [ "$ENABLE_EPGFIXER" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P epgfixer"
+fi
+if [ "$ENABLE_EPGSEARCH" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P epgsearch"
+fi
+if [ "$ENABLE_DUMMYDEVICE" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P dummydevice"
+fi
+if [ "$ENABLE_SATIP" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P satip"
+fi
+if [ "$ENABLE_MARKAD" == "true" ] ; then
+  VDR_ARG="$VDR_ARG -P markad"
+fi
+
+#if [ "$ENABLE_XMLTV2VDR" == "true" ] ; then
+#  VDR_ARG="$VDR_ARG -P 'xmltv2vdr --epgfile=$CACHE_DIR/epg.db'"
+#  # xmltv2vdr needs /var/run/vdr
+#  grep -q " /var/run/vdr " /proc/mounts || ( mkdir -p /var/run/vdr && mount -t tmpfs -o size=10% tmpfs /var/run/vdr )
+#  #handle epgsources
+#  mkdir -p /var/lib/epgsources
+#  mkdir -p $CONFIG_DIR/config/epgsources
+#  for source in `find $ADDON_DIR/config/epgsources -type f`; do
+#    if [ ! -e $CONFIG_DIR/config/epgsources/`basename $source` ] ; then
+#      cp $source $CONFIG_DIR/config/epgsources/
+#    fi
+#  done
+#  for source in `find $CONFIG_DIR/config/epgsources -type f`; do
+#    cp $source /var/lib/epgsources
+#  done
+#fi
+
+#RESTFULAPI_ARGS="--ip $RESTFULAPI_IP --port $RESTFULAPI_PORT"
+#RESTFULAPI_ARGS="$RESTFULAPI_ARGS --epgimages=\"$CONFIG_DIR/epgimages\""
+#RESTFULAPI_ARGS="$RESTFULAPI_ARGS --channellogos=\"$CONFIG_DIR/channellogos\""
+#VDR_ARG="$VDR_ARG -P 'restfulapi $RESTFULAPI_ARGS'"
+
+# vnsi last
+VDR_ARG="$VDR_ARG -P vnsiserver"
+
+# start
+create_dirs
+#mount_nfs &
+setup_remote
+
+#eval LANG=en_US.UTF-8 VDR_CHARSET_OVERRIDE="$VDR_CHARSET_OVERRIDE" exec /usr/bin/vdr $VDR_ARG
+eval LANG=de_DE.utf-8 exec /usr/bin/vdr $VDR_ARG
+

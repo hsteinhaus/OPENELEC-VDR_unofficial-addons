@@ -1,0 +1,10 @@
+[Unit]
+Description=VDR frontend service
+Requires=multi-user.target graphical.target
+After=graphical.target
+Conflicts=rescue.target
+Conflicts=kodi.target
+AllowIsolate=yes
+
+[Install]
+Alias=default.target
