@@ -1,0 +1,85 @@
+--- rpihddevice-1.0.0/Makefile	2015-11-06 21:27:08.000000000 +0100
++++ vdr-rpihddevice-1.0.0/Makefile	2015-11-06 22:29:26.409808307 +0100
+@@ -15,26 +15,28 @@
+ 
+ ### The directory environment:
+ 
+-# Use package data if installed...otherwise assume we're under the VDR source directory:
+-PKGCFG = $(if $(VDRDIR),$(shell pkg-config --variable=$(1) $(VDRDIR)/vdr.pc),$(shell PKG_CONFIG_PATH="$$PKG_CONFIG_PATH:../../.." pkg-config --variable=$(1) vdr))
+-LIBDIR = $(call PKGCFG,libdir)
+-LOCDIR = $(call PKGCFG,locdir)
+-PLGCFG = $(call PKGCFG,plgcfg)
+-#
+ TMPDIR ?= /tmp
+ 
+ ### The compiler options:
+ 
+-export CFLAGS   = $(call PKGCFG,cflags)
+-export CXXFLAGS = $(call PKGCFG,cxxflags)
++include $(VDRDIR)/Make.global
+ 
+ ### The version number of VDR's plugin API:
+ 
+-APIVERSION = $(call PKGCFG,apiversion)
++APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
+ 
+ ### Allow user defined options to overwrite defaults:
+ 
+--include $(PLGCFG)
++# backwards compatibility version < 1.7.34
++
++VDRSRC = $(VDRDIR)
++VDRSRC ?= ../../..
++ifeq ($(strip $(LIBDIR)),)
++LIBDIR = $(VDRSRC)/PLUGINS/lib
++endif
++
++-include $(VDRSRC)/Make.global
++-include $(VDRSRC)/Make.config
+ 
+ ### The name of the distribution archive:
+ 
+@@ -54,15 +56,25 @@
+ CXXFLAGS += -D__STDC_CONSTANT_MACROS
+ 
+ ILCDIR   =ilclient
+-VCINCDIR =$(SDKSTAGE)/opt/vc/include
+-VCLIBDIR =$(SDKSTAGE)/opt/vc/lib
+ 
+-INCLUDES += -I$(ILCDIR) -I$(VCINCDIR) -I$(VCINCDIR)/interface/vcos/pthreads 
+-INCLUDES += -I$(VCINCDIR)/interface/vmcs_host/linux
+- 
++#VCINCDIR =$(SDKSTAGE)/opt/vc/include
++#VCLIBDIR =$(SDKSTAGE)/opt/vc/lib
++
++#INCLUDES += -I$(ILCDIR) -I$(VCINCDIR) -I$(VCINCDIR)/interface/vcos/pthreads 
++#INCLUDES += -I$(VCINCDIR)/interface/vmcs_host/linux
++
++INCLUDES += -I$(VDRSRC)/include -I$(ILCDIR) -I$(OPTVC)/include -I$(OPTVC)/include/interface/vcos/pthreads -I$(OPTVC)/include/interface/vmcs_host/linux
++
++#INCLUDES += -I$(SYSROOT)/usr/include -I$(SYSROOT)/usr/include/interface/vcos -I$(SYSROOT)/usr/include/interface/vcos/pthreads
++#INCLUDES += -I$(SYSROOT)/usr/include/interface/vmcs_host/linux 
++
++#LDLIBS  += -lbcm_host -lvcos -lvchiq_arm -lopenmaxil -lGLESv2 -lEGL -lpthread -lrt
++#LDLIBS  += -Wl,--whole-archive $(ILCDIR)/libilclient.a -Wl,--no-whole-archive
++#LDFLAGS += -L$(VCLIBDIR)
++
+ LDLIBS  += -lbcm_host -lvcos -lvchiq_arm -lopenmaxil -lGLESv2 -lEGL -lpthread -lrt
+ LDLIBS  += -Wl,--whole-archive $(ILCDIR)/libilclient.a -Wl,--no-whole-archive
+-LDFLAGS += -L$(VCLIBDIR)
++LDFLAGS += -L$(OPTVC)/lib -Wl,-O1
+ 
+ DEBUG ?= 0
+ ifeq ($(DEBUG), 1)
+@@ -157,9 +169,10 @@
+ 
+ $(SOFILE): $(ILCLIENT) $(OBJS)
+ 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LDLIBS) -o $@
++	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
+ 
+ $(ILCLIENT):
+-	$(MAKE) --no-print-directory -C $(ILCDIR) all
++	$(MAKE) SYSROOT=$(SYSROOT) --no-print-directory -C $(ILCDIR) all
+ 
+ install-lib: $(SOFILE)
+ 	install -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
