@@ -31,20 +31,13 @@ PKG_SECTION="debug/tools"
 PKG_SHORTDESC="evtest: Simple tool for input event debugging."
 PKG_LONGDESC="evtest is a simple tool for input event debugging."
 
-PKG_IS_ADDON="yes"
-PKG_ADDON_TYPE="xbmc.python.script"
-PKG_ADDON_PROVIDES=""
-PKG_ADDON_REPOVERSION="4.3"
+PKG_IS_ADDON="no"
 
 PKG_AUTORECONF="yes"
 
 PKG_MAINTAINER="unofficial.addon.pro"
 
 makeinstall_target() {
-  : # nop
-}
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp -P $PKG_BUILD/.$TARGET_NAME/evtest $ADDON_BUILD/$PKG_ADDON_ID/bin
+  mkdir -p  $INSTALL/usr/bin
+  cp -P $ROOT/$PKG_BUILD/.$TARGET_NAME/evtest $INSTALL/usr/bin/
 }
