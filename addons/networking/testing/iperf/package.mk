@@ -31,7 +31,7 @@ PKG_SECTION="network/testing"
 PKG_SHORTDESC="iperf: A modern alternative for measuring maximum TCP and UDP bandwidth performance"
 PKG_LONGDESC="Iperf was developed by NLANR/DAST as a modern alternative for measuring maximum TCP and UDP bandwidth performance. Iperf allows the tuning of various parameters and UDP characteristics. Iperf reports bandwidth, delay jitter, datagram loss."
 
-PKG_IS_ADDON="yes"
+PKG_IS_ADDON="no"
 PKG_ADDON_TYPE="xbmc.python.script"
 PKG_ADDON_PROVIDES=""
 PKG_ADDON_REPOVERSION="4.3"
@@ -44,11 +44,8 @@ PKG_CONFIGURE_OPTS_TARGET="ac_cv_func_malloc_0_nonnull=yes \
             --disable-acl-support \
             --disable-xattr-support"
 
-makeinstall_target() {
-  : # nop
-}
 
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-  cp $PKG_BUILD/.$TARGET_NAME/src/iperf $ADDON_BUILD/$PKG_ADDON_ID/bin
+makeinstall_target() {
+  mkdir -p  $INSTALL/usr/bin
+  cp -P $ROOT/$PKG_BUILD/.$TARGET_NAME/src/iperf $INSTALL/usr/bin/
 }
