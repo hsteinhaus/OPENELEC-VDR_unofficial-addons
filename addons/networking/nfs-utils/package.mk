@@ -30,11 +30,7 @@ PKG_SHORTDESC="The Linux NFS utility package"
 PKG_LONGDESC="The Linux NFS utility package"
 PKG_DISCLAIMER="this is an unofficial addon. please don't ask for support in openelec forum / irc channel"
 
-PKG_IS_ADDON="yes"
-PKG_ADDON_TYPE="xbmc.python.script"
-PKG_ADDON_PROVIDES=""
-PKG_ADDON_REPOVERSION="4.3"
-
+PKG_IS_ADDON="no"
 PKG_AUTORECONF="yes"
 
 PKG_MAINTAINER="Lukas Rusak (lrusak at irc.freenode.net)"
@@ -62,9 +58,6 @@ pre_configure_target() {
 
 makeinstall_target() {
   : # nop
-}
-
-addon() {
-  mkdir -p $ADDON_BUILD/$PKG_ADDON_ID/bin
-      cp -p $ROOT/$PKG_BUILD/utils/mount/mount.nfs $ADDON_BUILD/$PKG_ADDON_ID/bin/mount.nfs4
+  mkdir -p $INSTALL/usr/bin
+      cp -p $ROOT/$PKG_BUILD/utils/mount/mount.nfs $INSTALL/usr/bin/mount.nfs4
 }
