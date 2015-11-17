@@ -1,0 +1,11 @@
+--- mcli-0.9.0/mcli.h	2015-11-17 12:57:44.000000000 +0100
++++ vdr-mcli-0.9.0/mcli.h	2015-11-17 17:18:50.590732809 +0100
+@@ -136,7 +136,7 @@
+ 	}
+ 	virtual const char *MainMenuEntry (void)
+ 	{
+-		return MCLI_MAINMENU_DESCRIPTION;
++		return NULL;
+ 	}
+ 	virtual cOsdObject *MainMenuAction (void);
+ 	virtual cMenuSetupPage *SetupMenu (void);
