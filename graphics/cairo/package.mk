@@ -46,7 +46,7 @@ PKG_CONFIGURE_OPTS_TARGET="--x-includes="$SYSROOT_PREFIX/usr/include" \
             --enable-atomic \
             --disable-gcov \
             --disable-valgrind \
-            --disable-xlib \
+            --enable-xlib \
             --disable-xlib-xrender \
             --disable-xcb \
             --disable-xlib-xcb \
