@@ -40,3 +40,9 @@ PKG_CONFIGURE_OPTS_TARGET="--disable-doc-cross-references \
             --disable-man \
             --enable-debug=no \
             --with-xft"
+
+
+post_makeinstall_target() {
+  mkdir -p $INSTALL/etc/pango
+  cp $PKG_DIR/config/* $INSTALL/etc/pango/
+}
