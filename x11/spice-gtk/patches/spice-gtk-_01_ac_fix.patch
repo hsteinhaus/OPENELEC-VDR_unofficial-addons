@@ -1,0 +1,11 @@
+--- _spice-gtk/spice-common/configure.ac	2015-09-03 17:25:34.000000000 +0200
++++ spice-gtk-0.30/spice-common/configure.ac	2016-02-23 22:50:30.044755169 +0100
+@@ -29,7 +29,7 @@
+ 
+ # Checks for libraries
+ PKG_CHECK_MODULES([PROTOCOL], [spice-protocol >= 0.12.10])
+-CODE_GENERATOR_BASEDIR=`pkg-config --variable=codegendir spice-protocol`
++CODE_GENERATOR_BASEDIR=${SPICE_PROTOCOL_PREFIX}/`pkg-config --variable=codegendir spice-protocol`
+ AC_SUBST([CODE_GENERATOR_BASEDIR])
+ 
+ SPICE_CHECK_PYTHON_MODULES()

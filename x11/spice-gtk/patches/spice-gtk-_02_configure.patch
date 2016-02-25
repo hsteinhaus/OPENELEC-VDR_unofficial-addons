@@ -1,0 +1,11 @@
+--- _spice-gtk/spice-common/configure	2015-09-25 17:50:08.000000000 +0200
++++ spice-gtk-0.30/spice-common/configure	2016-02-23 22:56:22.702867883 +0100
+@@ -13934,7 +13934,7 @@
+ $as_echo "yes" >&6; }
+ 
+ fi
+-CODE_GENERATOR_BASEDIR=`pkg-config --variable=codegendir spice-protocol`
++CODE_GENERATOR_BASEDIR=${SPICE_PROTOCOL_PREFIX}`pkg-config --variable=codegendir spice-protocol`
+ 
+ 
+ 

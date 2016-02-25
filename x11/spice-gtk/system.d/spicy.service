@@ -1,0 +1,17 @@
+[Unit]
+Description=SPICE client
+Requires=xorg.service
+After=xorg.service
+
+[Service]
+Environment=DISPLAY=:0
+Environment=HOME=/storage
+ExecStart=/usr/bin/spicy -h 192.168.3.72 -p 5903 -f --spice-usbredir-auto-redirect-filter=-1,-1,-1,-1,0|8,-1,-1,-1,1",
+KillMode=process
+Restart=always
+RestartSec=1
+StartLimitInterval=0
+TimeoutStopSec=1s
+
+[Install]
+WantedBy=graphical.target
